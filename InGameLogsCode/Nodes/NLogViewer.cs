@@ -83,11 +83,11 @@ public partial class NLogViewer : Panel
         if (@event is not InputEventKey { Pressed: true, Echo: false } key)
             return;
 
+        // No "is a text field focused" guard here: the Ctrl modifier already prevents
+        // accidental triggers, and the guard would block swapping from the console's prompt.
         if (key.Keycode == Key.Quoteleft && key.IsCommandOrControlPressed())
         {
-            var focus = GetViewport().GuiGetFocusOwner();
-            if (Visible || focus is not (TextEdit or LineEdit))
-                ToggleViewer();
+            ToggleViewer();
             GetViewport().SetInputAsHandled();
             return;
         }
@@ -155,6 +155,8 @@ public partial class NLogViewer : Panel
     public void ShowViewer()
     {
         Visible = true;
+        // Don't let keystrokes keep landing in whatever text field was focused underneath.
+        GetViewport()?.GuiReleaseFocus();
     }
 
     public void HideViewer()
