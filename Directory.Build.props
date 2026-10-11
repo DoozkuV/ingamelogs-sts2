@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <GameDir Condition="'$(GameDir)' == ''">$(HOME)/.local/share/Steam/steamapps/common/Slay the Spire 2</GameDir>
+    <Sts2DataDir Condition="'$(Sts2DataDir)' == ''">$(GameDir)/data_sts2_linuxbsd_x86_64</Sts2DataDir>
+    <ModInstallDir>$(GameDir)/mods/InGameLogs</ModInstallDir>
+    <GodotExe Condition="'$(GodotExe)' == ''">/usr/lib/megadot/MegaDot_v4.5.1-stable_mono_linux.x86_64</GodotExe>
+  </PropertyGroup>
+</Project>
