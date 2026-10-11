@@ -1,0 +1,154 @@
+[gd_scene load_steps=4 format=3 uid="uid://c1lgv0qnx4m7"]
+
+[ext_resource type="Script" path="res://InGameLogsCode/Nodes/NLogViewer.cs" id="1_script"]
+[ext_resource type="Theme" uid="uid://dk3p8rwu2hb6" path="res://InGameLogs/themes/console_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="panel_bg"]
+bg_color = Color(0.08, 0.08, 0.12, 0.95)
+border_width_top = 2
+border_color = Color(0, 0.831, 1, 0.8)
+
+[node name="LogViewerLayer" type="CanvasLayer"]
+process_mode = 3
+layer = 11
+
+[node name="LogViewer" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+theme = ExtResource("2_theme")
+theme_override_styles/panel = SubResource("panel_bg")
+script = ExtResource("1_script")
+
+[node name="OutputContainer" type="MarginContainer" parent="LogViewer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+
+[node name="OutputBuffer" type="RichTextLabel" parent="LogViewer/OutputContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "[color=#888888]Game log. Use 'F11' to toggle fullscreen. Press 'Escape' to close. Toggle log levels with the buttons below.[/color]
+
+"
+scroll_following = true
+selection_enabled = true
+context_menu_enabled = true
+
+[node name="Toolbar" type="HBoxContainer" parent="LogViewer"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -40.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="LogViewer/Toolbar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "logs"
+vertical_alignment = 1
+
+[node name="VeryDebugToggle" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_pressed_color = Color(0.694, 0.502, 0.827, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.694, 0.502, 0.827, 1)
+toggle_mode = true
+text = "VERYDEBUG"
+
+[node name="DebugToggle" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_pressed_color = Color(0.694, 0.502, 0.827, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.694, 0.502, 0.827, 1)
+toggle_mode = true
+text = "DEBUG"
+
+[node name="LoadToggle" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_pressed_color = Color(0.529, 0.808, 0.922, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.529, 0.808, 0.922, 1)
+toggle_mode = true
+button_pressed = true
+text = "LOAD"
+
+[node name="InfoToggle" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_pressed_color = Color(0.463, 1, 0.337, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.463, 1, 0.337, 1)
+toggle_mode = true
+button_pressed = true
+text = "INFO"
+
+[node name="WarnToggle" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_pressed_color = Color(1, 0.796, 0.239, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 0.796, 0.239, 1)
+toggle_mode = true
+button_pressed = true
+text = "WARN"
+
+[node name="ErrorToggle" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_pressed_color = Color(1, 0.278, 0.278, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 0.278, 0.278, 1)
+toggle_mode = true
+button_pressed = true
+text = "ERROR"
+
+[node name="LineCount" type="Label" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.533, 0.533, 0.533, 1)
+text = "0 lines"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="AutoscrollToggle" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+button_pressed = true
+text = "autoscroll"
+
+[node name="ClearButton" type="Button" parent="LogViewer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "clear"
+
+[connection signal="toggled" from="LogViewer/Toolbar/AutoscrollToggle" to="LogViewer" method="OnAutoscrollToggled"]
+[connection signal="pressed" from="LogViewer/Toolbar/ClearButton" to="LogViewer" method="OnClearPressed"]

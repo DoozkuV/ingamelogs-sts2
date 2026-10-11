@@ -4,7 +4,8 @@
   "author": "Doozku",
   "description": "View game logs in-game",
   "version": "0.1.0",
-  "has_pck": false,
+  "min_game_version": "0.111.0",
+  "has_pck": true,
   "has_dll": true,
   "dependencies": [],
   "affects_gameplay": false

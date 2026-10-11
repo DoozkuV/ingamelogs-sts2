@@ -11,8 +11,19 @@ config_version=5
 [application]
 
 config/name="InGameLogs"
-config/features=PackedStringArray("4.5")
+config/features=PackedStringArray("4.5", "C#")
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [dotnet]
 
 project/assembly_name="InGameLogs"
+
+[editor]
+
+export/convert_text_resources_to_binary=false

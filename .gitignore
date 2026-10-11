@@ -1,4 +1,7 @@
+# Godot editor cache (also holds Godot.NET.Sdk build output under .godot/mono/)
+.godot/
+# Exported pack is written straight into the game's mods folder
+*.pck
+# Legacy dotnet output dirs (Godot.NET.Sdk no longer uses them)
 bin/
 obj/
-*.pck
-godot/.godot/

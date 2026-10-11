@@ -1,19 +1,66 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Godot.NET.Sdk/4.5.1" InitialTargets="CheckDependencyPaths">
+  <Import Project=".\Sts2PathDiscovery.props" />
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
+    <PathMap>$(AppOutputBase)=.\</PathMap>
+    <!-- The game (sts2.dll) already provides the GodotPlugins.Game entrypoint; a mod must not emit a second one. -->
+    <GodotDisabledSourceGenerators>GodotPluginsInitializer</GodotDisabledSourceGenerators>
+    <!-- Mods are built as MSIL while the local game is platform-specific. -->
+    <NoWarn>$(NoWarn);MSB3270</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="sts2"><HintPath>$(Sts2DataDir)/sts2.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="0Harmony"><HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath><Private>false</Private></Reference>
-    <Reference Include="GodotSharp"><HintPath>$(Sts2DataDir)/GodotSharp.dll</HintPath><Private>false</Private></Reference>
+  <ItemGroup Condition="Exists('$(Sts2DataDir)')">
+    <Reference Include="sts2">
+      <HintPath>$(Sts2DataDir)/sts2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(Sts2DataDir)/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 
-  <Target Name="InstallMod" AfterTargets="Build">
-    <MakeDir Directories="$(ModInstallDir)" />
-    <Copy SourceFiles="$(TargetPath);InGameLogs.json" DestinationFolder="$(ModInstallDir)" />
+  <!-- Godot assets live next to the code; keep them out of the C# compile. -->
+  <ItemGroup>
+    <Compile Remove="InGameLogs/**;fonts/**;themes/**" />
+    <EmbeddedResource Remove="InGameLogs/**;fonts/**;themes/**" />
+    <None Include="InGameLogs.json;project.godot;export_presets.cfg;InGameLogs/**" />
+  </ItemGroup>
+
+  <Target Name="CheckDependencyPaths">
+    <Error Text="Slay the Spire 2 data not found at '$(Sts2DataDir)'"
+           Condition="'$(Sts2DataDir)' == '' or !Exists('$(Sts2DataDir)')" />
+  </Target>
+
+  <!-- `dotnet build`: dll + pdb + manifest into the game's mods folder. -->
+  <Target Name="CopyToModsFolderOnBuild" AfterTargets="PostBuildEvent">
+    <Message Text="Copying .dll, .pdb and .json to $(ModsPath)$(MSBuildProjectName)/" Importance="high" />
+    <MakeDir Directories="$(ModsPath)$(MSBuildProjectName)/" />
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(MSBuildProjectName).json"
+          DestinationFolder="$(ModsPath)$(MSBuildProjectName)/" />
+  </Target>
+
+  <!-- `dotnet publish`: additionally import + export the Godot project to a .pck. -->
+  <Target Name="NeedGodotForPublish" BeforeTargets="Publish">
+    <Error Text="Godot not found at '$(GodotPath)'. Set GodotPath in Directory.Build.props."
+           Condition="'$(GodotPath)' == '' or !Exists('$(GodotPath)')" />
+  </Target>
+
+  <Target Name="GodotImport" AfterTargets="Publish" Condition="'$(IsInnerGodotExport)' != 'true'">
+    <Message Text="Importing Godot project assets" Importance="high" />
+    <Exec Command="&quot;$(GodotPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --import"
+          EnvironmentVariables="IsInnerGodotExport=true;MSBUILDDISABLENODEREUSE=1"
+          ContinueOnError="WarnAndContinue" />
+  </Target>
+
+  <Target Name="GodotPublish" AfterTargets="GodotImport" Condition="'$(IsInnerGodotExport)' != 'true'">
+    <Message Text="Exporting Godot .pck to $(ModsPath)$(MSBuildProjectName)/" Importance="high" />
+    <Exec Command="&quot;$(GodotPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --export-pack &quot;BasicExport&quot; &quot;$(ModsPath)$(MSBuildProjectName)/$(MSBuildProjectName).pck&quot;"
+          EnvironmentVariables="IsInnerGodotExport=true;MSBUILDDISABLENODEREUSE=1"
+          ContinueOnError="WarnAndContinue" />
   </Target>
 </Project>
